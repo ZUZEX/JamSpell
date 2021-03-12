@@ -15,13 +15,25 @@ void PrintUsage(const char** argv) {
 
 int Train(const std::string& alphabetFile,
           const std::string& datasetFile,
-          const std::string& resultModelFile)
+          const std::string& resultModelFile,
+          const std::string& pre_trainedModelFile = "")
 {
     TLangModel model;
-    model.Train(datasetFile, alphabetFile);
+    model.Train(datasetFile, alphabetFile, pre_trainedModelFile);
     model.Dump(resultModelFile);
     return 0;
 }
+
+int Merge(const std::string& baseModelFile,
+          const std::string& complementaryModelFile,
+          const std::string& resultModelFile)
+{
+    TLangModel model;
+    model.Merge(baseModelFile, complementaryModelFile);
+    model.Dump(resultModelFile);
+    return 0;
+}
+
 
 int Score(const std::string& modelFile) {
     TLangModel model;
@@ -92,6 +104,12 @@ int main(int argc, const char** argv) {
         std::string alphabetFile = argv[2];
         std::string datasetFile = argv[3];
         std::string resultModelFile = argv[4];
+
+        if (argc == 6) {
+            std::string pre_trainedModelFile = argv[5];
+            return Train(alphabetFile, datasetFile, resultModelFile, pre_trainedModelFile);
+        }
+
         return Train(alphabetFile, datasetFile, resultModelFile);
     } else if (mode == "score") {
         if (argc < 3) {
@@ -116,6 +134,15 @@ int main(int argc, const char** argv) {
         std::string inFile = argv[3];
         std::string outFile = argv[4];
         return Fix(modelFile, inFile, outFile);
+    } else if (mode == "merge") {
+        if (argc < 5) {
+            PrintUsage(argv);
+            return 42;
+        }
+        std::string baseModelFile = argv[2];
+        std::string complementaryModelFile = argv[3];
+        std::string outFile = argv[4];
+        return Merge(baseModelFile, complementaryModelFile, outFile);
     }
 
     PrintUsage(argv);

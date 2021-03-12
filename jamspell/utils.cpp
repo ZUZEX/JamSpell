@@ -79,6 +79,12 @@ TSentences TTokenizer::Process(const std::wstring& originalText) const {
             currWord.Len += 1;
         } else {
             if (currWord.Ptr != nullptr) {
+                if (letter == L'-' && Alphabet.find(currWord.Ptr[currWord.Len - 1]) != Alphabet.end()) {
+                    currWord.Len += 1;
+                    continue;
+                } else if (currWord.Ptr[currWord.Len - 1] == L'-') {
+                    currWord.Len -= 1;
+                }
                 currSentence.push_back(currWord);
                 currWord = TWord();
             }
@@ -106,6 +112,13 @@ void TTokenizer::Clear() {
 
 const std::unordered_set<wchar_t>& TTokenizer::GetAlphabet() const {
     return Alphabet;
+}
+
+void TTokenizer::ExtendAlphabet(const std::unordered_set<wchar_t>& extension) {
+    for(const auto& letter : extension)
+    {
+        Alphabet.insert(letter);
+    }
 }
 
 std::wstring UTF8ToWide(const std::string& text) {
